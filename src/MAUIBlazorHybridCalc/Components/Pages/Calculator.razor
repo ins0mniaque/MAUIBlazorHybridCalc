@@ -2,8 +2,8 @@
 
 <h1>Calculator</h1>
 
-<div class="calculator">
-    <p>@PreviousInput @(CurrentOperation is { } operation ? ToSymbol(operation) : string.Empty)&nbsp;</p>
+<div>
+    <p class="state">@PreviousInput @(CurrentOperation is { } operation ? ToSymbol(operation) : string.Empty)&nbsp;</p>
     <input type="text" class="display" disabled @bind="CurrentInput">
     <div class="buttons">
         <button class="button clear" @onclick="ClearDisplay">C</button>
