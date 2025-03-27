@@ -2,4 +2,111 @@
 
 <h1>Calculator</h1>
 
-2 + 2 = 4
+<div class="calculator">
+    <p>@PreviousInput @(CurrentOperation is { } operation ? ToSymbol(operation) : string.Empty)&nbsp;</p>
+    <input type="text" class="display" disabled @bind="CurrentInput">
+    <div class="buttons">
+        <button class="button clear" @onclick="ClearDisplay">C</button>
+        <button class="button operator"
+            @onclick="() => AppendOperation(Operation.Divide)">@ToSymbol(Operation.Divide)</button>
+        <button class="button operator"
+            @onclick="() => AppendOperation(Operation.Multiply)">@ToSymbol(Operation.Multiply)</button>
+        <button class="button operator"
+            @onclick="() => AppendOperation(Operation.Subtract)">@ToSymbol(Operation.Subtract)</button>
+
+        <button class="button" @onclick="() => AppendNumber('7')">7</button>
+        <button class="button" @onclick="() => AppendNumber('8')">8</button>
+        <button class="button" @onclick="() => AppendNumber('9')">9</button>
+        <button class="button operator"
+            @onclick="() => AppendOperation(Operation.Add)">@ToSymbol(Operation.Add)</button>
+
+        <button class="button" @onclick="() => AppendNumber('4')">4</button>
+        <button class="button" @onclick="() => AppendNumber('5')">5</button>
+        <button class="button" @onclick="() => AppendNumber('6')">6</button>
+        <button class="button equal" @onclick="Calculate">=</button>
+
+        <button class="button" @onclick="() => AppendNumber('1')">1</button>
+        <button class="button" @onclick="() => AppendNumber('2')">2</button>
+        <button class="button" @onclick="() => AppendNumber('3')">3</button>
+        <button class="button" @onclick="() => AppendNumber('0')">0</button>
+    </div>
+</div>
+
+@code {
+    private enum Operation { Add, Subtract, Multiply, Divide }
+
+    private Operation? CurrentOperation { get; set; }
+    private string? CurrentInput { get; set; }
+    private string? PreviousInput { get; set; }
+
+    private void AppendNumber(char number)
+    {
+        if (!char.IsDigit(number))
+            throw new ArgumentOutOfRangeException(nameof(number), "Number is not a digit character");
+
+        CurrentInput = (CurrentInput ?? string.Empty) + number.ToString();
+        if (!double.TryParse(CurrentInput, out _))
+            CurrentInput = null;
+    }
+
+    private void AppendOperation(Operation operation)
+    {
+        if (CurrentInput is null)
+            return;
+
+        if (PreviousInput is not null)
+            Calculate();
+
+        CurrentOperation = operation;
+        PreviousInput = CurrentInput;
+        CurrentInput = null;
+    }
+
+    private void Calculate()
+    {
+        if (PreviousInput is null || CurrentInput is null)
+            return;
+
+        double.TryParse(PreviousInput, out var previous);
+        double.TryParse(CurrentInput, out var current);
+
+        double result;
+        switch (CurrentOperation)
+        {
+            case Operation.Add:
+                result = previous + current;
+                break;
+            case Operation.Subtract:
+                result = previous - current;
+                break;
+            case Operation.Multiply:
+                result = previous * current;
+                break;
+            case Operation.Divide:
+                result = previous / current;
+                break;
+            default:
+                return;
+        }
+
+        CurrentInput = result.ToString();
+        CurrentOperation = null;
+        PreviousInput = null;
+    }
+
+    private void ClearDisplay()
+    {
+        CurrentInput = null;
+        CurrentOperation = null;
+        PreviousInput = null;
+    }
+
+    private static string ToSymbol(Operation operation) => operation switch
+    {
+        Operation.Add => "+",
+        Operation.Subtract => "-",
+        Operation.Multiply => "*",
+        Operation.Divide => "/",
+        _ => throw new ArgumentOutOfRangeException(nameof(operation), "Unknown operation")
+    };
+}
