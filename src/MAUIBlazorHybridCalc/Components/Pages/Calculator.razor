@@ -52,10 +52,14 @@
     private void AppendOperation(Operation operation)
     {
         if (CurrentInput is null)
-            return;
+        {
+            if (PreviousInput is not null)
+                CurrentOperation = operation;
 
-        if (PreviousInput is not null)
-            Calculate();
+            return;
+        }
+
+        Calculate();
 
         CurrentOperation = operation;
         PreviousInput = CurrentInput;
