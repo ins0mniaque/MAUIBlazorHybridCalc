@@ -46,7 +46,7 @@
 
         CurrentInput = (CurrentInput ?? string.Empty) + number.ToString();
         if (!double.TryParse(CurrentInput, out _))
-            CurrentInput = null;
+            CurrentInput = number.ToString();
     }
 
     private void AppendOperation(Operation operation)
